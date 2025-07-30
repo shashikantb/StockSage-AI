@@ -1,5 +1,7 @@
 import {genkit} from 'genkit';
 import {groq} from 'genkitx-groq';
+import { llama3 } from 'genkitx-groq';
+
 
 export const ai = genkit({
   plugins: [
@@ -7,5 +9,5 @@ export const ai = genkit({
       apiKey: process.env.GROQ_API_KEY,
     }),
   ],
-  model: 'groq/llama3-8b-8192',
+  model: 'llama3-8b-8192',
 });
