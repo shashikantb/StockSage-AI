@@ -187,7 +187,7 @@ export default function Home() {
                   <li key={i}>
                     <button
                       onClick={() => handleSelectStock(s)}
-                      className="w-full text-left px-4 py-3 hover:bg-accent transition-colors duration-200"
+                      className="w-full text-left px-4 py-3 hover:bg-accent/50 transition-colors duration-200"
                     >
                       {s}
                     </button>
@@ -339,7 +339,6 @@ export default function Home() {
                 </div>
               )}
             </div>
-
           </motion.div>
         )}
       </AnimatePresence>
