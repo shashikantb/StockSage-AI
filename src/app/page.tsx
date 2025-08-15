@@ -65,6 +65,12 @@ function getStatusColorClass(colorCode: string): string {
 }
 
 const StarRating = ({ rating }: { rating: number }) => {
+  const getRatingColor = () => {
+    if (rating >= 4) return 'text-green-500 fill-green-500'; // Buy/Strong Buy
+    if (rating <= 2) return 'text-red-500 fill-red-500';     // Sell/Strong Sell
+    return 'text-yellow-400 fill-yellow-400';                // Hold
+  };
+
   return (
     <div className="flex items-center">
       {[...Array(5)].map((_, i) => (
@@ -73,7 +79,7 @@ const StarRating = ({ rating }: { rating: number }) => {
           className={cn(
             'h-6 w-6',
             i < Math.round(rating)
-              ? 'text-yellow-400 fill-yellow-400'
+              ? getRatingColor()
               : 'text-gray-300'
           )}
         />
