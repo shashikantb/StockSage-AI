@@ -14,7 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Logo } from '@/components/icons/logo';
 import { StockChart } from '@/components/StockChart';
-import { Lightbulb, Search, TrendingDown, TrendingUp, LineChart, Target, BookOpen, Calculator, Combine, Star, Landmark } from 'lucide-react';
+import { Lightbulb, Search, TrendingDown, TrendingUp, LineChart, Target, BookOpen, Calculator, Combine, Star, Landmark, Component } from 'lucide-react';
 
 type LoadingState = {
   search: boolean;
@@ -36,44 +36,14 @@ const signalThemes: SignalTheme = {
   Hold: { Icon: LineChart, badgeClass: 'bg-gray-500/20 text-gray-700 border-gray-500/50 hover:bg-gray-500/30' },
 };
 
-const strategySections = [
-  {
-    title: 'Technical Analysis–Based Strategies',
-    icon: Target,
-    content: 'Best for short- to medium-term traders. Includes Trend Following, Breakout Strategies, Relative Strength Analysis, and Volatility-Based strategies like Bollinger Bands.',
-    statusColor: 'bg-green-500',
-  },
-  {
-    title: 'Fundamental Analysis–Based Strategies',
-    icon: BookOpen,
-    content: 'Better for long-term investors. Focuses on Value, Growth, and Dividend Investing, as well as Sector Rotation based on macroeconomic cycles.',
-    statusColor: 'bg-red-500',
-  },
-  {
-    title: 'Quantitative / Data-Driven Strategies',
-    icon: Calculator,
-    content: 'For advanced users. Involves Mean Reversion, Factor Models (Momentum, Value, Quality), and Pairs Trading based on statistical arbitrage.',
-    statusColor: 'bg-green-500',
-  },
-  {
-    title: 'Hybrid Strategies (Tech + Fundamentals)',
-    icon: Combine,
-    content: 'Combine fundamental filters with technical triggers. Example: Select fundamentally strong stocks and buy on technical signals like RSI crossover.',
-    statusColor: 'bg-green-500',
-  },
-  {
-    title: 'Extra Features for Analysis Portal',
-    icon: Star,
-    content: 'Features to keep users engaged, such as Live Option Data, Sentiment Analysis, Portfolio Backtesting, and AI-driven Stock Screeners.',
-    statusColor: 'bg-red-500',
-  },
-  {
-    title: 'Institutional Trade Spotting',
-    icon: Landmark,
-    content: 'Utilize resources like NSE bulk and block deal reports to spot large institutional trades that can indicate future market movements.',
-    statusColor: 'bg-green-500',
-  },
-];
+const strategyIcons: { [key: string]: React.ElementType } = {
+  'Technical Analysis–Based Strategies': Target,
+  'Fundamental Analysis–Based Strategies': BookOpen,
+  'Quantitative / Data-Driven Strategies': Calculator,
+  'Hybrid Strategies (Tech + Fundamentals)': Combine,
+  'Extra Features for Analysis Portal': Star,
+  'Institutional Trade Spotting': Landmark,
+};
 
 
 function getSignalFromColor(colorCode: string): Signal {
@@ -85,6 +55,13 @@ function getSignalFromColor(colorCode: string): Signal {
     return 'Sell';
   }
   return 'Hold';
+}
+
+function getStatusColorClass(colorCode: string): string {
+    const lowerColor = colorCode.toLowerCase();
+    if (lowerColor.includes('green')) return 'bg-green-500';
+    if (lowerColor.includes('red')) return 'bg-red-500';
+    return 'bg-gray-500';
 }
 
 export default function Home() {
@@ -101,8 +78,12 @@ export default function Home() {
   const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setSearchTerm(value);
-    setAnalysisResult(null);
-    setSelectedStock(null);
+    
+    if (value.length === 0) {
+      setAnalysisResult(null);
+      setSelectedStock(null);
+      setSuggestions([]);
+    }
 
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current);
@@ -152,7 +133,7 @@ export default function Home() {
     }
   }, [toast]);
 
-  const signal = analysisResult ? getSignalFromColor(analysisResult.colorCode) : null;
+  const signal = analysisResult ? getSignalFromColor(analysisResult.overallColorCode) : null;
   const theme = signal ? signalThemes[signal] : null;
 
   return (
@@ -207,102 +188,127 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
-            className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4"
+            className="w-full max-w-6xl space-y-8 mt-4"
           >
-            <div className="lg:col-span-2 space-y-8">
-              <Card className="overflow-hidden shadow-xl" style={analysisResult ? { borderColor: analysisResult.colorCode, borderWidth: '2px' } : {}}>
-                <CardHeader>
-                  <CardTitle className="font-headline text-3xl flex items-center justify-between">
-                    {selectedStock ? `Analysis for ${selectedStock}` : 'Analysis'}
-                    {loading.analysis ? <Skeleton className="h-8 w-24" /> : theme && (
-                      <Badge variant="outline" className={`text-base px-4 py-2 rounded-full ${theme.badgeClass}`}>
-                        <theme.Icon className="h-5 w-5 mr-2" />
-                        {signal}
-                      </Badge>
-                    )}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {loading.analysis ? (
-                    <div className="space-y-3">
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-4/5" />
-                    </div>
-                  ) : (
-                    <p className="text-lg leading-relaxed">{analysisResult?.analysis}</p>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-xl">
-                <CardHeader>
-                  <CardTitle className="font-headline text-2xl">Performance Chart</CardTitle>
-                  <CardDescription>Mocked historical price data for {selectedStock}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {loading.analysis ? (
-                     <div className="w-full h-[300px] flex items-center justify-center">
-                        <Skeleton className="w-full h-full"/>
-                     </div>
-                  ) : selectedStock && <StockChart ticker={selectedStock} />}
-                </CardContent>
-              </Card>
-            </div>
-            
-            <div className="lg:col-span-1">
-              <Card className="shadow-xl">
-                <CardHeader>
-                  <CardTitle className="font-headline text-2xl flex items-center">
-                    <Lightbulb className="h-6 w-6 mr-2 text-primary" />
-                    Prompt Ideas
-                  </CardTitle>
-                  <CardDescription>Use these AI-generated prompts for a deeper dive.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {loading.prompts ? (
-                      <>
-                        <Skeleton className="h-10 w-full" />
-                        <Skeleton className="h-10 w-full" />
-                        <Skeleton className="h-10 w-full" />
-                      </>
+            {/* Main analysis and chart */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-8">
+                <Card className="overflow-hidden shadow-xl" style={analysisResult ? { borderColor: analysisResult.overallColorCode, borderWidth: '2px' } : {}}>
+                  <CardHeader>
+                    <CardTitle className="font-headline text-3xl flex items-center justify-between">
+                      {selectedStock ? `Analysis for ${selectedStock}` : 'Analysis'}
+                      {loading.analysis ? <Skeleton className="h-8 w-24" /> : theme && (
+                        <Badge variant="outline" className={`text-base px-4 py-2 rounded-full ${theme.badgeClass}`}>
+                          <theme.Icon className="h-5 w-5 mr-2" />
+                          {signal}
+                        </Badge>
+                      )}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {loading.analysis ? (
+                      <div className="space-y-3">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-4/5" />
+                      </div>
                     ) : (
-                      promptSuggestions.map((prompt, i) => (
-                        <Button key={i} variant="ghost" className="w-full justify-start text-left h-auto py-2" onClick={() => handleSelectStock(selectedStock!, prompt)}>
-                          {prompt}
-                        </Button>
-                      ))
+                      <p className="text-lg leading-relaxed">{analysisResult?.overallAnalysis}</p>
                     )}
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+
+                <Card className="shadow-xl">
+                  <CardHeader>
+                    <CardTitle className="font-headline text-2xl">Performance Chart</CardTitle>
+                    <CardDescription>Mocked historical price data for {selectedStock}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {loading.analysis ? (
+                       <div className="w-full h-[300px] flex items-center justify-center">
+                          <Skeleton className="w-full h-full"/>
+                       </div>
+                    ) : selectedStock && <StockChart ticker={selectedStock} />}
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <div className="lg:col-span-1">
+                <Card className="shadow-xl">
+                  <CardHeader>
+                    <CardTitle className="font-headline text-2xl flex items-center">
+                      <Lightbulb className="h-6 w-6 mr-2 text-primary" />
+                      Prompt Ideas
+                    </CardTitle>
+                    <CardDescription>Use these AI-generated prompts for a deeper dive.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {loading.prompts ? (
+                        <>
+                          <Skeleton className="h-10 w-full" />
+                          <Skeleton className="h-10 w-full" />
+                          <Skeleton className="h-10 w-full" />
+                        </>
+                      ) : (
+                        promptSuggestions.map((prompt, i) => (
+                          <Button key={i} variant="ghost" className="w-full justify-start text-left h-auto py-2" onClick={() => handleSelectStock(selectedStock!, prompt)}>
+                            {prompt}
+                          </Button>
+                        ))
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
+
+            {/* Strategy sections */}
+            <div>
+              <h2 className="text-3xl font-headline font-bold text-primary mb-6 text-center">
+                Stock Analysis Strategies
+              </h2>
+              {loading.analysis ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {Array.from({ length: 6 }).map((_, index) => (
+                           <Card key={index} className="shadow-lg">
+                               <CardHeader>
+                                   <Skeleton className="h-6 w-3/4" />
+                               </CardHeader>
+                               <CardContent>
+                                   <Skeleton className="h-4 w-full" />
+                                   <Skeleton className="h-4 w-full mt-2" />
+                                   <Skeleton className="h-4 w-2/3 mt-2" />
+                               </CardContent>
+                           </Card>
+                      ))}
+                  </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {analysisResult?.strategies?.map((section, index) => {
+                    const Icon = strategyIcons[section.title] || Star;
+                    return (
+                      <Card key={index} className="shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
+                         <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
+                          <div className={`w-3 h-3 rounded-full ${getStatusColorClass(section.colorCode)} flex-shrink-0`}></div>
+                          <div className="flex items-center gap-2">
+                            <Icon className="h-6 w-6 text-primary" />
+                            <CardTitle className="font-headline text-xl">{section.title}</CardTitle>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="flex-grow">
+                          <p className="text-muted-foreground">{section.content}</p>
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
           </motion.div>
         )}
       </AnimatePresence>
-
-      <div className="w-full max-w-6xl mt-12">
-        <h2 className="text-3xl font-headline font-bold text-primary mb-6 text-center">
-          Stock Analysis Strategies
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {strategySections.map((section, index) => (
-            <Card key={index} className="shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
-               <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
-                <div className={`w-3 h-3 rounded-full ${section.statusColor} flex-shrink-0`}></div>
-                <div className="flex items-center gap-2">
-                  <section.icon className="h-6 w-6 text-primary" />
-                  <CardTitle className="font-headline text-xl">{section.title}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <p className="text-muted-foreground">{section.content}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
     </main>
   );
 }
