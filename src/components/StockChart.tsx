@@ -5,18 +5,18 @@ import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } f
 import { useEffect, useState } from "react";
 
 const generateChartData = () => {
-  let lastPrice = 150 + Math.random() * 50;
+  let lastPrice = 1500 + Math.random() * 500;
   return Array.from({ length: 12 }, (_, i) => {
     const month = new Date(0, i).toLocaleString('default', { month: 'long' });
-    lastPrice += (Math.random() - 0.45) * 20;
-    lastPrice = Math.max(50, lastPrice); // Ensure price doesn't go too low
+    lastPrice += (Math.random() - 0.45) * 200;
+    lastPrice = Math.max(500, lastPrice); // Ensure price doesn't go too low
     return { month, price: Math.round(lastPrice) };
   });
 }
 
 const chartConfig = {
   price: {
-    label: "Price (USD)",
+    label: "Price (INR)",
     color: "hsl(var(--primary))",
   },
 } satisfies ChartConfig
@@ -50,8 +50,8 @@ export function StockChart({ ticker }: StockChartProps) {
           tickLine={false}
           axisLine={false}
           tickMargin={8}
-          tickFormatter={(value) => `$${value}`}
-          domain={['dataMin - 20', 'dataMax + 20']}
+          tickFormatter={(value) => `₹${value}`}
+          domain={['dataMin - 200', 'dataMax + 200']}
         />
         <XAxis
           dataKey="month"

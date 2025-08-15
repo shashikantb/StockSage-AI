@@ -221,7 +221,7 @@ export default function Home() {
                 <Card className="shadow-xl">
                   <CardHeader>
                     <CardTitle className="font-headline text-2xl">Performance Chart</CardTitle>
-                    <CardDescription>Mocked historical price data for {selectedStock}</CardDescription>
+                    <CardDescription>Demonstration chart with placeholder data for {selectedStock}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {loading.analysis ? (
