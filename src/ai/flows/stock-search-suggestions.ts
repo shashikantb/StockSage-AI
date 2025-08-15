@@ -39,11 +39,10 @@ const prompt = ai.definePrompt({
   output: {schema: StockSearchSuggestionsOutputSchema},
   prompt: `You are an AI assistant that provides stock search suggestions based on the user's input.
 
+  Return a JSON object with a "suggestions" key, which is an array of strings.
   Provide a maximum of 5 suggestions.
 
-  Search Term: {{{searchTerm}}}
-
-  Suggestions:`,
+  Search Term: {{{searchTerm}}}`,
 });
 
 const stockSearchSuggestionsFlow = ai.defineFlow(
