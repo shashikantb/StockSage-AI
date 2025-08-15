@@ -53,11 +53,17 @@ const prompt = ai.definePrompt({
   name: 'aiStockAnalysisPrompt',
   input: {schema: AiStockAnalysisInputSchema},
   output: {schema: AiStockAnalysisOutputSchema},
-  prompt: `You are an expert stock analyst AI. For the given stock ticker {{{ticker}}}, provide an overall analysis and then a detailed analysis for each of the following 6 strategies.
+  prompt: `You are an expert stock analyst AI. For the given stock ticker {{{ticker}}}, you must provide an overall analysis and a detailed analysis for each of the 6 strategies listed below.
 
-For the overall analysis, provide a summary and an overallColorCode from green (positive) to red (negative).
+Your response MUST be a valid JSON object that strictly follows the provided output schema.
 
-For each of the 6 strategies, provide a title, a brief analysis (content), and a colorCode ('green', 'red', or 'gray') to indicate the stock's status for that strategy.
+1.  **Overall Analysis**:
+    *   Provide a summary of the stock's current standing.
+    *   Set the 'overallColorCode' to a color from green (positive) to red (negative) based on the overall outlook.
+
+2.  **Strategies Analysis**:
+    *   You MUST provide an analysis for all 6 of the following strategies.
+    *   For each strategy, provide a 'title', a brief 'content' analysis, and a 'colorCode' ('green', 'red', or 'gray').
 
 The 6 strategies are:
 1.  **Technical Analysis–Based Strategies**: Best for short- to medium-term traders. Includes Trend Following, Breakout Strategies, Relative Strength Analysis, and Volatility-Based strategies.
@@ -67,7 +73,7 @@ The 6 strategies are:
 5.  **Extra Features for Analysis Portal**: Analyze the availability and potential impact of features like Live Option Data, Sentiment Analysis, and AI-driven screeners for this stock.
 6.  **Institutional Trade Spotting**: Analyze bulk and block deal reports for signs of large institutional trades.
 
-Return a valid JSON object matching the output schema.
+Return a valid JSON object matching the output schema. Ensure the 'strategies' array is always present and contains exactly 6 items.
   `,
 });
 
