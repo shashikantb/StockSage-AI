@@ -313,7 +313,7 @@ export default function Home() {
                                    <Skeleton className="h-4 w-full" />
                                    <Skeleton className="h-4 w-full mt-2" />
                                    <Skeleton className="h-4 w-2/3 mt-2" />
-                               </Content>
+                               </CardContent>
                            </Card>
                       ))}
                   </div>
