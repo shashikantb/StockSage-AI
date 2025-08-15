@@ -40,7 +40,7 @@ const prompt = ai.definePrompt({
   prompt: `You are an AI assistant that provides stock search suggestions based on the user's input.
 
   Return a JSON object with a "suggestions" key, which is an array of strings.
-  Provide a maximum of 5 suggestions.
+  Provide a maximum of 5 suggestions. If no relevant suggestions are found, return an empty array for the "suggestions" key.
 
   Search Term: {{{searchTerm}}}`,
 });
