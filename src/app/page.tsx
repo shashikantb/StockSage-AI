@@ -14,7 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Logo } from '@/components/icons/logo';
 import { StockChart } from '@/components/StockChart';
-import { Lightbulb, Search, TrendingDown, TrendingUp, LineChart } from 'lucide-react';
+import { Lightbulb, Search, TrendingDown, TrendingUp, LineChart, Target, BookOpen, Calculator, Combine, Star, Landmark } from 'lucide-react';
 
 type LoadingState = {
   search: boolean;
@@ -35,6 +35,46 @@ const signalThemes: SignalTheme = {
   Sell: { Icon: TrendingDown, badgeClass: 'bg-red-500/20 text-red-700 border-red-500/50 hover:bg-red-500/30' },
   Hold: { Icon: LineChart, badgeClass: 'bg-gray-500/20 text-gray-700 border-gray-500/50 hover:bg-gray-500/30' },
 };
+
+const strategySections = [
+  {
+    title: 'Technical Analysis–Based Strategies',
+    icon: Target,
+    content: 'Best for short- to medium-term traders. Includes Trend Following, Breakout Strategies, Relative Strength Analysis, and Volatility-Based strategies like Bollinger Bands.',
+    statusColor: 'bg-green-500',
+  },
+  {
+    title: 'Fundamental Analysis–Based Strategies',
+    icon: BookOpen,
+    content: 'Better for long-term investors. Focuses on Value, Growth, and Dividend Investing, as well as Sector Rotation based on macroeconomic cycles.',
+    statusColor: 'bg-red-500',
+  },
+  {
+    title: 'Quantitative / Data-Driven Strategies',
+    icon: Calculator,
+    content: 'For advanced users. Involves Mean Reversion, Factor Models (Momentum, Value, Quality), and Pairs Trading based on statistical arbitrage.',
+    statusColor: 'bg-green-500',
+  },
+  {
+    title: 'Hybrid Strategies (Tech + Fundamentals)',
+    icon: Combine,
+    content: 'Combine fundamental filters with technical triggers. Example: Select fundamentally strong stocks and buy on technical signals like RSI crossover.',
+    statusColor: 'bg-green-500',
+  },
+  {
+    title: 'Extra Features for Analysis Portal',
+    icon: Star,
+    content: 'Features to keep users engaged, such as Live Option Data, Sentiment Analysis, Portfolio Backtesting, and AI-driven Stock Screeners.',
+    statusColor: 'bg-red-500',
+  },
+  {
+    title: 'Institutional Trade Spotting',
+    icon: Landmark,
+    content: 'Utilize resources like NSE bulk and block deal reports to spot large institutional trades that can indicate future market movements.',
+    statusColor: 'bg-green-500',
+  },
+];
+
 
 function getSignalFromColor(colorCode: string): Signal {
   const lowerColor = colorCode.toLowerCase();
@@ -241,6 +281,28 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <div className="w-full max-w-6xl mt-12">
+        <h2 className="text-3xl font-headline font-bold text-primary mb-6 text-center">
+          Stock Analysis Strategies
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {strategySections.map((section, index) => (
+            <Card key={index} className="shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
+               <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
+                <div className={`w-3 h-3 rounded-full ${section.statusColor} flex-shrink-0`}></div>
+                <div className="flex items-center gap-2">
+                  <section.icon className="h-6 w-6 text-primary" />
+                  <CardTitle className="font-headline text-xl">{section.title}</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <p className="text-muted-foreground">{section.content}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
     </main>
   );
 }
