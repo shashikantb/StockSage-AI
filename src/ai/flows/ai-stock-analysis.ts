@@ -37,6 +37,14 @@ const AiStockAnalysisOutputSchema = z.object({
       'Overall color code indicating performance (green to red shades).' +
       'Must be a valid CSS color value (e.g., "green", "#00FF00", "rgba(0, 255, 0, 1)").'
     ),
+  consolidatedRating: z
+    .number()
+    .describe(
+      'A consolidated rating from 1 to 5 (1=Strong Sell, 2=Sell, 3=Hold, 4=Buy, 5=Strong Buy).'
+    ),
+  ratingReasoning: z
+    .string()
+    .describe('A brief explanation for the consolidated rating.'),
   strategies: z
     .array(StrategyAnalysisSchema)
     .describe('An array of analyses for different stock strategies.'),
@@ -53,7 +61,7 @@ const prompt = ai.definePrompt({
   name: 'aiStockAnalysisPrompt',
   input: {schema: AiStockAnalysisInputSchema},
   output: {schema: AiStockAnalysisOutputSchema},
-  prompt: `You are an expert stock analyst AI. For the given stock ticker {{{ticker}}}, you must provide an overall analysis and a detailed analysis for each of the 6 strategies listed below.
+  prompt: `You are an expert stock analyst AI. For the given stock ticker {{{ticker}}}, you must provide an overall analysis, a consolidated rating, and a detailed analysis for each of the 6 strategies listed below.
 
 Your response MUST be a valid JSON object that strictly follows the provided output schema.
 
@@ -61,7 +69,11 @@ Your response MUST be a valid JSON object that strictly follows the provided out
     *   Provide a summary of the stock's current standing.
     *   Set the 'overallColorCode' to a color from green (positive) to red (negative) based on the overall outlook.
 
-2.  **Strategies Analysis**:
+2.  **Consolidated Rating**:
+    *   Provide a 'consolidatedRating' from 1 to 5, where 1 is Strong Sell and 5 is Strong Buy.
+    *   Provide a brief 'ratingReasoning' to justify the rating.
+
+3.  **Strategies Analysis**:
     *   You MUST provide an analysis for all 6 of the following strategies.
     *   For each strategy, provide a 'title', a brief 'content' analysis, and a 'colorCode' ('green', 'red', or 'gray').
 

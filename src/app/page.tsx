@@ -13,8 +13,8 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Logo } from '@/components/icons/logo';
-import { StockChart } from '@/components/StockChart';
-import { Lightbulb, Search, TrendingDown, TrendingUp, LineChart, Target, BookOpen, Calculator, Combine, Star, Landmark, Component } from 'lucide-react';
+import { Lightbulb, Search, TrendingDown, TrendingUp, LineChart, Target, BookOpen, Calculator, Combine, Star, Landmark } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type LoadingState = {
   search: boolean;
@@ -63,6 +63,24 @@ function getStatusColorClass(colorCode: string): string {
     if (lowerColor.includes('red')) return 'bg-red-500';
     return 'bg-gray-500';
 }
+
+const StarRating = ({ rating }: { rating: number }) => {
+  return (
+    <div className="flex items-center">
+      {[...Array(5)].map((_, i) => (
+        <Star
+          key={i}
+          className={cn(
+            'h-6 w-6',
+            i < Math.round(rating)
+              ? 'text-yellow-400 fill-yellow-400'
+              : 'text-gray-300'
+          )}
+        />
+      ))}
+    </div>
+  );
+};
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -217,20 +235,36 @@ export default function Home() {
                     )}
                   </CardContent>
                 </Card>
-
-                <Card className="shadow-xl">
+                 <Card className="shadow-xl">
                   <CardHeader>
-                    <CardTitle className="font-headline text-2xl">Performance Chart</CardTitle>
-                    <CardDescription>Demonstration chart with placeholder data for {selectedStock}</CardDescription>
+                    <CardTitle className="font-headline text-2xl">Consolidated Rating</CardTitle>
+                    <CardDescription>
+                      AI-generated rating based on multiple factors.
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     {loading.analysis ? (
-                       <div className="w-full h-[300px] flex items-center justify-center">
-                          <Skeleton className="w-full h-full"/>
-                       </div>
-                    ) : selectedStock && <StockChart ticker={selectedStock} />}
+                      <div className="space-y-4">
+                        <Skeleton className="h-8 w-32" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-5/6" />
+                      </div>
+                    ) : (
+                      analysisResult && (
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-4">
+                            <StarRating rating={analysisResult.consolidatedRating} />
+                             <span className="text-xl font-bold">{`${analysisResult.consolidatedRating.toFixed(1)} / 5.0`}</span>
+                          </div>
+                          <p className="text-muted-foreground">
+                            {analysisResult.ratingReasoning}
+                          </p>
+                        </div>
+                      )
+                    )}
                   </CardContent>
                 </Card>
+
               </div>
               
               <div className="lg:col-span-1">
@@ -279,7 +313,7 @@ export default function Home() {
                                    <Skeleton className="h-4 w-full" />
                                    <Skeleton className="h-4 w-full mt-2" />
                                    <Skeleton className="h-4 w-2/3 mt-2" />
-                               </CardContent>
+                               </Content>
                            </Card>
                       ))}
                   </div>
